@@ -1,0 +1,52 @@
+cmake_minimum_required(VERSION 2.8)
+project(OpenVINO_Code)
+
+set(CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
+    set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "")
+    message(STATUS "CMAKE_BUILD_TYPE not defined, 'Release' will be used")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+if (NOT(BIN_FOLDER))
+    string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} ARCH)
+    if(ARCH STREQUAL "x86_64" OR ARCH STREQUAL "amd64") # Windows detects Intel's 64-bit CPU as AMD64
+        set(ARCH intel64)
+    elseif(ARCH STREQUAL "i386")
+        set(ARCH ia32)
+    endif()
+    set (BIN_FOLDER ${ARCH})
+endif()
+
+find_package(OpenCV REQUIRED)
+if(NOT OpenCV_FOUND)
+    message(WARNING "OPENCV is disabled or not found, skipped")
+    return()
+else()
+    message(STATUS "OPENCV ${OpenCV_VERSION} is found in ${OpenCV_DIR}")
+endif()
+
+if (IE_NOT_FOUND_MESSAGE)
+    find_package(InferenceEngine 2.0 QUIET)
+    if (NOT(InferenceEngine_FOUND))
+        message(FATAL_ERROR ${IE_NOT_FOUND_MESSAGE})
+    endif()
+else()
+    find_package(InferenceEngine 2.0 REQUIRED)
+    message(STATUS "InferenceEngine ${InferenceEngine_VERSION} is found in ${InferenceEngine_DIR}")
+endif()
+
+if(TARGET IE::ie_cpu_extension)
+    add_definitions(-DWITH_EXTENSIONS)
+endif()
+
+include_directories(CommonFiles)
+
+add_subdirectory(ImageClassification)
+add_subdirectory(ObjectDetection)
+add_subdirectory(SemanticSegmentation)
+add_subdirectory(InstanceSegmentation)
