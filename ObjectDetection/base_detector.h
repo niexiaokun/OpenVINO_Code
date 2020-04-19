@@ -10,8 +10,6 @@
 #include <opencv2/core/types.hpp>
 #include <chrono>
 
-typedef std::chrono::duration<double, std::ratio<1, 1000>> ms;
-
 using namespace InferenceEngine;
 
 struct DetectionObject {
@@ -90,8 +88,7 @@ protected:
     float iou_t;
     float conf_th;
     bool isFirstFrame;
-
-    void frameToBlob(cv::Mat& image, InferRequest::Ptr &inferRequest, std::string &input_name);
+    
     void draw_detection_result(cv::Mat& image, std::vector<DetectionObject>& detectObjs);
 };
 

@@ -1,26 +1,24 @@
 //
-// Created by kun on 2020/4/18.
+// Created by kun on 2020/4/19.
 //
 
-#include "maskRCNN.h"
-#include "helper.h"
+#include "Segmentation.h"
 #include <iostream>
 #include <chrono>
 #include "slog.hpp"
-#include "ocv_common.hpp"
 #include <opencv2/opencv.hpp>
 
 #define ASYNC_EXEC
 
+typedef std::chrono::duration<double, std::ratio<1, 1000>> ms;
 
 int main(int argc, char *argv[]){
-
     InferenceEngine::Core ie;
-    maskRCNN maskRcnn;
-    std::string model_path = "../../ir_models/instance-segmentation-security-0083/FP16/instance-segmentation-security-0083.xml";
-    maskRcnn.initiate(ie, model_path, "CPU");
+    Segmentation segmentation;
+    std::string model_path = "../../ir_models/semantic-segmentation-adas-0001/FP16/semantic-segmentation-adas-0001.xml";
+    segmentation.initiate(ie, model_path, "CPU");
 
-    std::string video_path = "/home/kun/dataset/videos/person.mp4";
+    std::string video_path = "/home/kun/dataset/videos/car.mp4";
     cv::VideoCapture video_capture(video_path);
     size_t wait_time = 1;
     cv::Mat curr_frame;
@@ -40,7 +38,7 @@ int main(int argc, char *argv[]){
                 return -1;
             }
             isFirstFrame = false;
-            cv::resize(curr_frame, curr_frame, maskRcnn.InputSize);
+            cv::resize(curr_frame, curr_frame, segmentation.InputSize);
         }
         video_capture >> next_frame;
         if(next_frame.empty()){
@@ -48,8 +46,8 @@ int main(int argc, char *argv[]){
             break;
         }
         result = curr_frame.clone();
-        cv::resize(next_frame, next_frame, maskRcnn.InputSize);
-        maskRcnn.start_async_exec(curr_frame, next_frame, result);
+        cv::resize(next_frame, next_frame, segmentation.InputSize);
+        segmentation.start_async_exec(curr_frame, next_frame, result);
         next_frame.copyTo(curr_frame);
 #else
         video_capture >> curr_frame;
@@ -57,9 +55,9 @@ int main(int argc, char *argv[]){
                 slog::info << "first frame is empty" << slog::endl;
                 return -1;
             }
-            cv::resize(curr_frame, curr_frame, maskRcnn.InputSize);
+            cv::resize(curr_frame, curr_frame, segmentation.InputSize);
             result = curr_frame.clone();
-            maskRcnn.start_sync_exec(curr_frame, result);
+            segmentation.start_sync_exec(curr_frame, result);
 #endif
 
         auto t1 = std::chrono::high_resolution_clock::now();
@@ -80,6 +78,5 @@ int main(int argc, char *argv[]){
         }
     }
     cv::destroyAllWindows();
-
     return 0;
 }

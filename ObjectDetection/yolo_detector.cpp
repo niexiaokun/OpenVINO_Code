@@ -3,6 +3,7 @@
 //
 
 #include "yolo_detector.h"
+#include "helper.h"
 #include "slog.hpp"
 #include "common.hpp"
 #include <opencv2/opencv.hpp>
@@ -85,11 +86,11 @@ bool yolo_detector::initiate(InferenceEngine::Core &ie, const std::string &model
 
 bool yolo_detector::start_async_exec(cv::Mat &curr_frame, cv::Mat &next_frame, cv::Mat &result) {
     if(isFirstFrame){
-        this->frameToBlob(curr_frame, curr_infer_request, InputName);
+        helper::frameToBlob(curr_frame, curr_infer_request, InputName);
         curr_infer_request->StartAsync();
         isFirstFrame = false;
     } else{
-        this->frameToBlob(next_frame, next_infer_request, InputName);
+        helper::frameToBlob(next_frame, next_infer_request, InputName);
         next_infer_request->StartAsync();
     }
 

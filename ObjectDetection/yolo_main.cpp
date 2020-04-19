@@ -10,6 +10,8 @@
 
 #define ASYNC_EXEC
 
+typedef std::chrono::duration<double, std::ratio<1, 1000>> ms;
+
 int main(int argc, char *argv[]){
     try {
         InferenceEngine::Core ie;

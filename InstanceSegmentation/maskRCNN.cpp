@@ -68,8 +68,8 @@ bool maskRCNN::initiate(InferenceEngine::Core &ie, const std::string &model_path
                std::to_string(this->input_height)+" x "+std::to_string(this->input_width) << slog::endl;
 
     slog::info << "Preparing output blobs" << slog::endl;
-    this->network.addOutput("DetectionOutput", 0);
-    this->network.addOutput("DetectionOutput", 1);
+//    this->network.addOutput("DetectionOutput", 0);
+//    this->network.addOutput("DetectionOutput", 1);
 
     for(auto &item : this->outputInfo){
         item.second->setPrecision(Precision::FP32);
@@ -94,14 +94,14 @@ bool maskRCNN::start_async_exec(cv::Mat &curr_frame, cv::Mat &next_frame, cv::Ma
     }
 
     if (OK == curr_infer_request->Wait(IInferRequest::WaitMode::RESULT_READY)){
-        const auto masks_blob = curr_infer_request->GetBlob("6849/Unsqueeze");
+        const auto masks_blob = curr_infer_request->GetBlob("raw_masks"); //6849/Unsqueeze
         const auto masks_data = masks_blob->buffer().as<float*>();
 
-        const auto box_blob = curr_infer_request->GetBlob("DetectionOutput.0");
+        const auto box_blob = curr_infer_request->GetBlob("boxes");    //DetectionOutput.0
         const auto box_data = box_blob->buffer().as<float*>();
-        const auto cls_blob = curr_infer_request->GetBlob("DetectionOutput.1");
+        const auto cls_blob = curr_infer_request->GetBlob("classes");  //DetectionOutput.1
         const auto cls_data = cls_blob->buffer().as<float*>();
-        const auto prob_blob = curr_infer_request->GetBlob("DetectionOutput.2");
+        const auto prob_blob = curr_infer_request->GetBlob("scores");  //DetectionOutput.2
         const auto prob_data = prob_blob->buffer().as<float*>();
 
         const float PROBABILITY_THRESHOLD = 0.2f;
