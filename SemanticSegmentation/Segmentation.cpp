@@ -53,10 +53,10 @@ bool Segmentation::initiate(InferenceEngine::Core &ie, const std::string &model_
 
     slog::info << "Preparing output blobs" << slog::endl;
 
-    const OutputsDataMap& outputsDataMap = network.getOutputsInfo();
-    if (outputsDataMap.size() != 1) throw std::runtime_error("Demo supports topologies only with 1 output");
-    OutputName = outputsDataMap.begin()->first;
-    Data& data = *outputsDataMap.begin()->second;
+    this->outputInfo = network.getOutputsInfo();
+    if (this->outputInfo.size() != 1) throw std::runtime_error("Demo supports topologies only with 1 output");
+    OutputName = this->outputInfo.begin()->first;
+    Data& data = *this->outputInfo.begin()->second;
     // if the model performs ArgMax, its output type can be I32 but for models that return heatmaps for each
     // class the output is usually FP32. Reset the precision to avoid handling different types with switch in
     // postprocessing
@@ -69,7 +69,7 @@ bool Segmentation::initiate(InferenceEngine::Core &ie, const std::string &model_
             outWidth = outSizeVector[2];
             break;
         case 4:
-            outChannels = outSizeVector[1]==1? 0 : outSizeVector[1];
+            outChannels = outSizeVector[1] == 1? 0 : outSizeVector[1];
             outHeight = outSizeVector[2];
             outWidth = outSizeVector[3];
             break;
