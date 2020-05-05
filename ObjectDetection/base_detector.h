@@ -9,6 +9,9 @@
 #include <inference_engine.hpp>
 #include <opencv2/core/types.hpp>
 #include <chrono>
+#ifdef WITH_EXTENSIONS
+#include <ext_list.hpp>
+#endif
 
 using namespace InferenceEngine;
 

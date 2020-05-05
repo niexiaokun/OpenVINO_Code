@@ -13,15 +13,14 @@ else()
     message(STATUS "InferenceEngine ${InferenceEngine_VERSION} is found in ${InferenceEngine_DIR}")
 endif()
 
-if(TARGET IE::ie_cpu_extension)
-    add_definitions(-DWITH_EXTENSIONS)
-endif()
-
 add_executable(segmentation main.cpp Segmentation.cpp Segmentation.h)
 
 target_link_libraries(
         segmentation
         ${InferenceEngine_LIBRARIES}
         ${OpenCV_LIBRARIES}
-        #  IE::ie_cpu_extension
 )
+
+if (TARGET IE::ie_cpu_extension)
+    target_link_libraries(segmentation IE::ie_cpu_extension)
+endif ()

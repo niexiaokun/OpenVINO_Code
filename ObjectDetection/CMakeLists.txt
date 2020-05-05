@@ -13,10 +13,6 @@ else()
     message(STATUS "InferenceEngine ${InferenceEngine_VERSION} is found in ${InferenceEngine_DIR}")
 endif()
 
-if(TARGET IE::ie_cpu_extension)
-    add_definitions(-DWITH_EXTENSIONS)
-endif()
-
 #file (GLOB IE_HEADERS
 #        ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 #        ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp
@@ -29,11 +25,14 @@ target_link_libraries(
         ssd_main
         ${InferenceEngine_LIBRARIES}
         ${OpenCV_LIBRARIES}
-      #  IE::ie_cpu_extension
 )
 target_link_libraries(
         yolo_main
         ${InferenceEngine_LIBRARIES}
         ${OpenCV_LIBRARIES}
-       # IE::ie_cpu_extension
 )
+
+if (TARGET IE::ie_cpu_extension)
+    target_link_libraries(ssd_main IE::ie_cpu_extension)
+    target_link_libraries(yolo_main IE::ie_cpu_extension)
+endif ()

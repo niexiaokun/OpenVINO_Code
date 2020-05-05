@@ -7,6 +7,9 @@
 
 #include <iostream>
 #include <inference_engine.hpp>
+#ifdef WITH_EXTENSIONS
+#include <ext_list.hpp>
+#endif
 #include <opencv2/core/types.hpp>
 #include <chrono>
 
